@@ -1,4 +1,11 @@
 <?php
+/**
+ * ==============================================
+ * Nama Anggota  : Ariyan
+ * Nama File     : index.php
+ * Deskripsi     : Entry point & router utama aplikasi (switch based routing)
+ * ==============================================
+ */
 require_once __DIR__ . '/autoload.php';
 Session::start();
 

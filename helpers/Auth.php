@@ -1,4 +1,11 @@
 <?php
+/**
+ * ==============================================
+ * Nama Anggota  : Ariyan
+ * Nama File     : helpers/Auth.php
+ * Deskripsi     : Helper autentikasi (check login, user info, role)
+ * ==============================================
+ */
 class Auth
 {
     public static function checkLogin(): void

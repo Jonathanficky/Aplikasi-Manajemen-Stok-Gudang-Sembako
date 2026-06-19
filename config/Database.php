@@ -1,4 +1,11 @@
 <?php
+/**
+ * ==============================================
+ * Nama Anggota  : Ariyan
+ * Nama File     : config/Database.php
+ * Deskripsi     : Koneksi database menggunakan pattern Singleton (MySQLi)
+ * ==============================================
+ */
 class Database
 {
     private static $instance = null;

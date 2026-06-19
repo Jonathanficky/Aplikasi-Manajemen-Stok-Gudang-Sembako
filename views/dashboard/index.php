@@ -1,4 +1,12 @@
-<?php $title = 'Dashboard - Toko Sembako'; $activeMenu = 'dashboard'; ?>
+<?php
+/**
+ * ==============================================
+ * Nama Anggota  : Ariyan
+ * Nama File     : views/dashboard/index.php
+ * Deskripsi     : Tampilan dashboard dengan kartu statistik & tabel stok kritis
+ * ==============================================
+ */
+$title = 'Dashboard - Toko Sembako'; $activeMenu = 'dashboard'; ?>
 <?php include __DIR__ . '/../layouts/header.php'; ?>
 
 <main class="p-8 space-y-6">

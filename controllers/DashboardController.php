@@ -1,4 +1,11 @@
 <?php
+/**
+ * ==============================================
+ * Nama Anggota  : Ariyan
+ * Nama File     : controllers/DashboardController.php
+ * Deskripsi     : Controller untuk halaman dashboard (ringkasan & notifikasi)
+ * ==============================================
+ */
 class DashboardController
 {
     public function index(): void

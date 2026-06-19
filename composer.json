@@ -1,0 +1,14 @@
+{
+    "name": "app/stok-gudang",
+    "autoload": {
+        "classmap": [
+            "config/",
+            "controllers/",
+            "helpers/",
+            "models/"
+        ]
+    },
+    "require": {
+        "phpoffice/phpspreadsheet": "^5.8"
+    }
+}

@@ -1,0 +1,46 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: #fcfcfc; /* Background utama */
+}
+
+/* Warna menu navbar saat aktif */
+.nav-item-active { 
+    background-color: #4b5563; 
+    color: white;
+}
+
+/* Desain Kotak/Card utama */
+.card-container { 
+    border: 1px solid #111827; 
+    border-radius: 16px; 
+    background: white; 
+}
+
+/* Desain bar pencarian */
+.search-bar { 
+    background-color: #f3f4f6; 
+    border-radius: 12px; 
+}
+
+/* Garis bawah pada baris tabel */
+.table-row-line { 
+    border-bottom: 1px solid #e5e7eb; 
+}
+
+/* Animasi untuk Popup Notifikasi */
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.notif-popup {
+    animation: slideDown 0.2s ease-out forwards;
+    transform-origin: top right;
+}
+
+/* Custom Scrollbar agar lebih rapi */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }

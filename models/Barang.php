@@ -61,6 +61,22 @@ class Barang
         return null;
     }
 
+    public static function findByKode(string $kode): ?self
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $stmt = mysqli_prepare($koneksi, "SELECT * FROM barang WHERE kode_barang = ?");
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, 's', $kode);
+            mysqli_stmt_execute($stmt);
+            $r = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+            mysqli_stmt_close($stmt);
+            if ($r) {
+                return new self($r);
+            }
+        }
+        return null;
+    }
+
     public static function total(): int
     {
         $koneksi = Database::getInstance()->getConnection();
@@ -90,6 +106,20 @@ class Barang
         return (int) ($r['jml'] ?? 0);
     }
 
+    public static function isKodeExists(string $kode): bool
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $stmt = mysqli_prepare($koneksi, "SELECT COUNT(*) as jml FROM barang WHERE kode_barang = ?");
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, 's', $kode);
+            mysqli_stmt_execute($stmt);
+            $r = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+            mysqli_stmt_close($stmt);
+            return ((int) ($r['jml'] ?? 0)) > 0;
+        }
+        return false;
+    }
+
     public static function cekStok(int $id_barang): int
     {
         $koneksi = Database::getInstance()->getConnection();
@@ -104,13 +134,13 @@ class Barang
         return 0;
     }
 
-    public function save(): bool
+    public function save()
     {
         $koneksi = Database::getInstance()->getConnection();
         $kode_barang = mysqli_real_escape_string($koneksi, $this->kode_barang);
         $nama_barang = mysqli_real_escape_string($koneksi, $this->nama_barang);
         $id_kategori = (int) ($this->id_kategori ?? 0);
-        $stok = (int) ($this->stok ?? 0);
+        $stok = max(0, (int) ($this->stok ?? 0));
         $stok_min = (int) ($this->stok_min ?? 0);
         $harga_beli = (int) ($this->harga_beli ?? 0);
 
@@ -124,6 +154,13 @@ class Barang
         }
 
         $result = mysqli_stmt_execute($stmt);
+
+        if ($result && !$this->id_barang) {
+            $newId = (int) mysqli_insert_id($koneksi);
+            mysqli_stmt_close($stmt);
+            return $newId;
+        }
+
         mysqli_stmt_close($stmt);
         return $result;
     }
@@ -147,5 +184,41 @@ class Barang
     public function totalNilaiAset(): float
     {
         return $this->stok * $this->harga_beli;
+    }
+
+    public static function byKategori(int $id_kategori): array
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $result = [];
+        $stmt = mysqli_prepare($koneksi, "SELECT b.*, k.nama_kategori FROM barang b LEFT JOIN kategori k ON b.id_kategori = k.id_kategori WHERE b.id_kategori = ? ORDER BY b.nama_barang ASC");
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, 'i', $id_kategori);
+            mysqli_stmt_execute($stmt);
+            $q = mysqli_stmt_get_result($stmt);
+            while ($r = mysqli_fetch_assoc($q)) {
+                $result[] = new self($r);
+            }
+            mysqli_stmt_close($stmt);
+        }
+        return $result;
+    }
+
+    public static function totalByKategori(int $id_kategori): int
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $stmt = mysqli_prepare($koneksi, "SELECT COUNT(*) as jml FROM barang WHERE id_kategori = ?");
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, 'i', $id_kategori);
+            mysqli_stmt_execute($stmt);
+            $r = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+            mysqli_stmt_close($stmt);
+            return (int) ($r['jml'] ?? 0);
+        }
+        return 0;
+    }
+
+    public function namaKategori(): string
+    {
+        return $this->nama_kategori ?? '-';
     }
 }

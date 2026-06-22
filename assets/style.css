@@ -44,3 +44,14 @@ body {
 /* Custom Scrollbar agar lebih rapi */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+
+/* Animasi spinner loading untuk tombol submit */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner-inline {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 6px;
+    animation: spin 0.7s linear infinite;
+}

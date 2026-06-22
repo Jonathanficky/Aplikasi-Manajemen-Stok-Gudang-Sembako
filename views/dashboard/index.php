@@ -48,6 +48,21 @@ $title = 'Dashboard - Toko Sembako'; $activeMenu = 'dashboard'; ?>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="space-y-3">
+            <h3 class="font-bold text-gray-900 text-sm">Grafik Stok per Kategori</h3>
+            <div class="border border-gray-900 rounded-2xl p-5 bg-white min-h-[250px]">
+                <canvas id="chartStok"></canvas>
+            </div>
+        </div>
+        <div class="space-y-3">
+            <h3 class="font-bold text-gray-900 text-sm">Grafik Transaksi Bulanan</h3>
+            <div class="border border-gray-900 rounded-2xl p-5 bg-white min-h-[250px]">
+                <canvas id="chartTransaksi"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="space-y-3">
             <h3 class="font-bold text-gray-900 text-sm">Barang Stok Rendah</h3>
             <div class="border border-gray-900 rounded-2xl p-5 space-y-4 bg-white min-h-[200px]">
                 <?php if (count($barangKritis) > 0): ?>
@@ -87,5 +102,47 @@ $title = 'Dashboard - Toko Sembako'; $activeMenu = 'dashboard'; ?>
         </div>
     </div>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    new Chart(document.getElementById('chartStok'), {
+        type: 'bar',
+        data: {
+            labels: <?= $chartLabels ?>,
+            datasets: [{
+                label: 'Total Stok',
+                data: <?= $chartData ?>,
+                backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+    });
+
+    new Chart(document.getElementById('chartTransaksi'), {
+        type: 'line',
+        data: {
+            labels: <?= $chartMonthlyLabels ?>,
+            datasets: [{
+                label: 'Total Nilai (IDR)',
+                data: <?= $chartMonthlyData ?>,
+                borderColor: 'rgba(16, 185, 129, 1)',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
 
 <?php include __DIR__ . '/../layouts/footer.php'; ?>

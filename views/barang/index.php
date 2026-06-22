@@ -12,10 +12,34 @@
         </button>
     </div>
 
+    <?php if ($jmlKritis > 0): ?>
+    <div class="border border-red-500 bg-white p-4 flex items-center gap-4 rounded-xl shadow-sm">
+        <div class="bg-red-500 text-white p-1.5 rounded">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+        </div>
+        <div>
+            <h4 class="text-red-600 font-bold text-sm leading-none">Peringatan Stok Rendah</h4>
+            <p class="text-[10px] text-red-500 mt-1 uppercase">Terdapat <?= $jmlKritis ?> barang dengan stok di bawah batas minimum. Segera lakukan pengadaan.</p>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <div class="border border-gray-900 rounded-2xl p-6 bg-white shadow-sm">
-        <div class="search-bar flex items-center px-4 py-3 gap-3 bg-gray-100 rounded-xl">
-            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            <input type="text" placeholder="Cari barang..." class="bg-transparent border-none outline-none text-sm w-full text-gray-600">
+        <div class="flex items-center gap-4">
+            <div class="search-bar flex items-center px-4 py-3 gap-3 bg-gray-100 rounded-xl flex-1">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="cariBarang" placeholder="Cari barang..." class="bg-transparent border-none outline-none text-sm w-full text-gray-600">
+            </div>
+            <select id="filterKategori" onchange="filterByKategori(this.value)" class="px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-black bg-white text-sm font-medium">
+                <option value="">Semua Kategori</option>
+                <?php foreach ($kategoriList as $k): ?>
+                    <option value="<?= $k->id_kategori ?>" <?= $selectedKategori == $k->id_kategori ? 'selected' : '' ?>><?= $k->nama_kategori ?></option>
+                <?php endforeach; ?>
+            </select>
+            <a href="index.php?page=barang_export_kategori&kategori=<?= $selectedKategori > 0 ? $selectedKategori : 1 ?>" class="bg-green-600 text-white px-4 py-3 rounded-xl text-sm font-bold hover:bg-green-700 transition-all flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Export Excel
+            </a>
         </div>
     </div>
 
@@ -31,6 +55,7 @@
                         <th class="pb-3 px-2">No</th>
                         <th class="pb-3 px-2">Kode</th>
                         <th class="pb-3 px-2">Nama Barang</th>
+                        <th class="pb-3 px-2">Kategori</th>
                         <th class="pb-3 px-2 text-center">Stok</th>
                         <th class="pb-3 px-2">Harga Beli</th>
                         <th class="pb-3 px-2 text-right">Aksi</th>
@@ -42,6 +67,7 @@
                             <td class="py-4 px-2"><?= $no++; ?></td>
                             <td class="py-4 px-2 font-mono text-xs text-gray-500 uppercase"><?= $row->kode_barang; ?></td>
                             <td class="py-4 px-2 font-bold text-gray-900"><?= htmlspecialchars($row->nama_barang); ?></td>
+                            <td class="py-4 px-2 text-gray-500 text-xs"><?= $row->namaKategori(); ?></td>
                             <td class="py-4 px-2 text-center">
                                 <span class="px-3 py-1 rounded-full font-bold text-xs <?= $row->isStokKritis() ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-green-100 text-green-600 border border-green-200' ?>">
                                     <?= $row->stok ?>
@@ -50,11 +76,11 @@
                             <td class="py-4 px-2 font-medium text-gray-900">Rp <?= number_format($row->harga_beli, 0, ',', '.') ?></td>
                             <td class="py-4 px-2 text-right">
                                 <button onclick="openEditModal('<?= $row->id_barang ?>', '<?= $row->kode_barang ?>', '<?= htmlspecialchars($row->nama_barang) ?>', '<?= $row->id_kategori ?>', '<?= $row->stok ?>', '<?= $row->stok_min ?>', '<?= $row->harga_beli ?>')" class="text-blue-600 font-bold mr-4">Edit</button>
-                                <a href="index.php?page=barang&amp;hapus_id=<?= $row->id_barang ?>" onclick="return confirm('Hapus?')" class="text-red-600 font-bold">Hapus</a>
+                                <a href="index.php?page=barang&amp;hapus_id=<?= $row->id_barang ?>" onclick="return confirmDelete(this.href, 'Hapus barang ini?')" class="text-red-600 font-bold">Hapus</a>
                             </td>
                         </tr>
                     <?php endforeach; else: ?>
-                        <tr><td colspan="6" class="py-12 text-center text-gray-400">Belum ada data barang.</td></tr>
+                        <tr><td colspan="7" class="py-12 text-center text-gray-400">Belum ada data barang.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -62,15 +88,15 @@
     </div>
 </main>
 
-<div id="modalBarang" class="modal fixed inset-0 flex items-center justify-center z-[100]">
-    <div class="modal-overlay absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onclick="closeModal()"></div>
-    <div class="modal-container bg-white w-11/12 md:max-w-2xl mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden">
+<div id="modalBarang" class="modal fixed inset-0 flex items-start justify-center overflow-y-auto z-[120]">
+    <div class="modal-overlay fixed inset-0 bg-gray-900/50 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="modal-container bg-white w-11/12 md:max-w-2xl mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden relative mt-8 mb-8">
         <div class="p-8">
             <div class="flex justify-between items-center pb-4 border-b border-gray-100">
                 <p id="modalTitle" class="text-xl font-black">Tambah Barang Baru</p>
                 <button onclick="closeModal()" class="text-gray-400 hover:text-black text-2xl">&times;</button>
             </div>
-            <form action="index.php?page=barang" method="POST" class="mt-6 space-y-4">
+            <form action="index.php?page=barang" method="POST" class="mt-6 space-y-4" onsubmit="return disableSubmit(this)">
                 <input type="hidden" name="id_barang" id="form_id">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -146,6 +172,25 @@
         modal.classList.remove('active');
         document.body.classList.remove('modal-active');
     }
+    function filterByKategori(id) {
+        window.location.href = 'index.php?page=barang' + (id ? '&kategori=' + id : '');
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var input = document.getElementById('cariBarang');
+        if (input) {
+            input.addEventListener('keyup', function() {
+                var kw = this.value.toLowerCase();
+                document.querySelectorAll('tbody tr').forEach(function(row) {
+                    if (row.cells.length <= 1) return;
+                    var found = false;
+                    row.querySelectorAll('td').forEach(function(cell) {
+                        if (cell.innerText.toLowerCase().includes(kw)) found = true;
+                    });
+                    row.style.display = found ? '' : 'none';
+                });
+            });
+        }
+    });
 </script>
 
 <?php include __DIR__ . '/../layouts/footer.php'; ?>

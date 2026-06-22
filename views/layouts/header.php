@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Toko Sembako' ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
     <link rel="stylesheet" href="assets/style.css">
     <style>
         .modal { transition: opacity 0.2s ease; opacity: 0; pointer-events: none; }
@@ -68,7 +69,7 @@
                     <p class="text-sm font-bold text-gray-900 leading-none"><?= $nama_user ?></p>
                     <p class="text-[10px] text-gray-400"><?= strtoupper($role_user) ?></p>
                 </div>
-                <a href="index.php?page=logout" onclick="return confirm('Keluar?')" class="text-gray-900 hover:text-red-600">
+                <a href="index.php?page=logout" onclick="return confirmDelete(this.href, 'Keluar dari sistem?')" class="text-gray-900 hover:text-red-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                 </a>
             </div>

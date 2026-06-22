@@ -23,13 +23,13 @@ class AuthController
         $user = User::login($username, $password);
 
         if ($user) {
+            Session::getFlash(); // hapus flash lama dari login gagal sebelumnya
             $user->simpanSession();
             header("location:index.php?page=dashboard");
+            exit();
         } else {
-            echo "<script>
-                    alert('Login Gagal! Username atau Password yang Anda masukkan salah.');
-                    window.location.href='index.php?page=login';
-                  </script>";
+            Session::setFlash('error', 'Login Gagal! Username atau Password salah.');
+            header("location:index.php?page=login");
         }
         exit();
     }

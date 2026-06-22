@@ -24,6 +24,22 @@ class DashboardController
             $transaksiTerbaru[] = $r;
         }
 
+        $kategoriStok = Kategori::allWithStokCount();
+        $chartLabels = [];
+        $chartData = [];
+        foreach ($kategoriStok as $ks) {
+            $chartLabels[] = $ks['nama_kategori'];
+            $chartData[] = (int) $ks['total_stok'];
+        }
+
+        $monthly = TransaksiMasuk::monthlySummary();
+        $chartMonthlyLabels = [];
+        $chartMonthlyData = [];
+        foreach (array_reverse($monthly) as $m) {
+            $chartMonthlyLabels[] = date('M Y', strtotime($m['bulan'] . '-01'));
+            $chartMonthlyData[] = (int) $m['total_nilai'];
+        }
+
         View::render('dashboard/index', [
             'nama_user' => $user['nama_lengkap'],
             'role_user' => $user['role'],
@@ -33,6 +49,10 @@ class DashboardController
             'jmlKeluar' => TransaksiKeluar::total(),
             'barangKritis' => $barangKritis,
             'transaksiTerbaru' => $transaksiTerbaru,
+            'chartLabels' => json_encode($chartLabels),
+            'chartData' => json_encode($chartData),
+            'chartMonthlyLabels' => json_encode($chartMonthlyLabels),
+            'chartMonthlyData' => json_encode($chartMonthlyData),
         ]);
     }
 }

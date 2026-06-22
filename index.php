@@ -45,6 +45,11 @@ switch ($page) {
         }
         break;
 
+    case 'barang_export_kategori':
+        $controller = new BarangController();
+        $controller->exportByKategori();
+        break;
+
     case 'kategori':
         $controller = new KategoriController();
         if (isset($_POST['simpan_kategori'])) {
@@ -77,6 +82,8 @@ switch ($page) {
             $controller->simpan();
         } elseif (isset($_POST['update_masuk'])) {
             $controller->update();
+        } elseif (isset($_GET['cetak_pdf'])) {
+            $controller->cetakPDF((int) $_GET['cetak_pdf']);
         } else {
             $controller->index();
         }
@@ -86,6 +93,8 @@ switch ($page) {
         $controller = new TransaksiKeluarController();
         if (isset($_POST['simpan_keluar'])) {
             $controller->simpan();
+        } elseif (isset($_GET['cetak_pdf'])) {
+            $controller->cetakPDF((int) $_GET['cetak_pdf']);
         } else {
             $controller->index();
         }

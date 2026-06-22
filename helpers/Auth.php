@@ -11,7 +11,7 @@ class Auth
     public static function checkLogin(): void
     {
         if (!Session::isLoggedIn()) {
-            header("location:login.php");
+            header("location:index.php?page=login");
             exit();
         }
     }

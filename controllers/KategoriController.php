@@ -20,6 +20,7 @@ class KategoriController
         Auth::checkLogin();
         $kategori = new Kategori($_POST);
         $kategori->save();
+        Session::setFlash('success', 'Kategori berhasil ditambahkan!');
         header("location:index.php?page=kategori");
         exit();
     }
@@ -32,6 +33,9 @@ class KategoriController
             $kategori->nama_kategori = $_POST['nama_kategori'];
             $kategori->deskripsi = $_POST['deskripsi'];
             $kategori->save();
+            Session::setFlash('success', 'Kategori berhasil diperbarui!');
+        } else {
+            Session::setFlash('error', 'Kategori tidak ditemukan!');
         }
         header("location:index.php?page=kategori");
         exit();
@@ -43,6 +47,9 @@ class KategoriController
         $kategori = Kategori::find($id);
         if ($kategori) {
             $kategori->delete();
+            Session::setFlash('success', 'Kategori berhasil dihapus!');
+        } else {
+            Session::setFlash('error', 'Kategori tidak ditemukan!');
         }
         header("location:index.php?page=kategori");
         exit();

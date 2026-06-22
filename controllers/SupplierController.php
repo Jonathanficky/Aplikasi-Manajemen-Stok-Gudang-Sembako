@@ -21,6 +21,7 @@ class SupplierController
         Auth::checkLogin();
         $supplier = new Supplier($_POST);
         $supplier->save();
+        Session::setFlash('success', 'Supplier berhasil ditambahkan!');
         header("location:index.php?page=supplier");
         exit();
     }
@@ -34,6 +35,9 @@ class SupplierController
             $supplier->no_telp = $_POST['no_telp'];
             $supplier->alamat = $_POST['alamat'];
             $supplier->save();
+            Session::setFlash('success', 'Supplier berhasil diperbarui!');
+        } else {
+            Session::setFlash('error', 'Supplier tidak ditemukan!');
         }
         header("location:index.php?page=supplier");
         exit();
@@ -45,6 +49,9 @@ class SupplierController
         $supplier = Supplier::find($id);
         if ($supplier) {
             $supplier->delete();
+            Session::setFlash('success', 'Supplier berhasil dihapus!');
+        } else {
+            Session::setFlash('error', 'Supplier tidak ditemukan!');
         }
         header("location:index.php?page=supplier");
         exit();

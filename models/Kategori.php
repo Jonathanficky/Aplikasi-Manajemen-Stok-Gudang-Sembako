@@ -51,6 +51,23 @@ class Kategori
         return (int) ($r['jml'] ?? 0);
     }
 
+    public static function allWithStokCount(): array
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $result = [];
+        $q = mysqli_query($koneksi, "SELECT k.*, COALESCE(SUM(b.stok), 0) as total_stok, COUNT(b.id_barang) as total_barang
+            FROM kategori k
+            LEFT JOIN barang b ON k.id_kategori = b.id_kategori
+            GROUP BY k.id_kategori
+            ORDER BY k.nama_kategori ASC");
+        if ($q) {
+            while ($r = mysqli_fetch_assoc($q)) {
+                $result[] = $r;
+            }
+        }
+        return $result;
+    }
+
     public function save(): bool
     {
         $koneksi = Database::getInstance()->getConnection();

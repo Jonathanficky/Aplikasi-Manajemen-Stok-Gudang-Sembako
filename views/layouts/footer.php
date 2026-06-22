@@ -1,4 +1,11 @@
-    <?php if (Session::hasFlash()): $flash = Session::getFlash(); ?>
+    <?php
+    /**
+     * ==============================================
+     * Nama Anggota  : Ariyan
+     * Nama File     : views/layouts/footer.php
+     * ==============================================
+     */
+    if (Session::hasFlash()): $flash = Session::getFlash(); ?>
     <style>
         .toast-popup {
             position: fixed;

@@ -1,4 +1,10 @@
 <?php
+/**
+ * ==============================================
+ * Nama Anggota  : Ariyan
+ * Nama File     : controllers/AuthController.php
+ * ==============================================
+ */
 class AuthController
 {
     public function login(): void

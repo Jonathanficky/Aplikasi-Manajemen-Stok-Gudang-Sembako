@@ -1,4 +1,10 @@
 <?php
+/**
+ * ==============================================
+ * Nama Anggota  : Ariyan
+ * Nama File     : models/Barang.php
+ * ==============================================
+ */
 class Barang
 {
     public $id_barang;

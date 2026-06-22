@@ -1,4 +1,11 @@
-<?php $title = 'Barang - Toko Sembako'; $activeMenu = 'barang'; ?>
+<?php
+/**
+ * ==============================================
+ * Nama Anggota  : Ariyan
+ * Nama File     : views/barang/index.php
+ * ==============================================
+ */
+$title = 'Barang - Toko Sembako'; $activeMenu = 'barang'; ?>
 <?php include __DIR__ . '/../layouts/header.php'; ?>
 
 <main class="p-8 space-y-6">

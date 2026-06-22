@@ -1,4 +1,10 @@
 <?php
+/**
+ * ==============================================
+ * Nama Anggota  : Ariyan
+ * Nama File     : controllers/BarangController.php
+ * ==============================================
+ */
 class BarangController
 {
     public function index(): void

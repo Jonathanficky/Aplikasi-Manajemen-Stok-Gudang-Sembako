@@ -44,7 +44,7 @@
                             <td class="py-4 px-2 text-gray-500 max-w-xs truncate"><?= htmlspecialchars($row->alamat); ?></td>
                             <td class="py-4 px-2 text-right">
                                 <button onclick="openEditModal('<?= $row->id_supplier ?>', '<?= htmlspecialchars($row->nama_supplier) ?>', '<?= htmlspecialchars($row->no_telp) ?>', '<?= htmlspecialchars($row->alamat) ?>')" class="text-blue-600 font-bold mr-4">Edit</button>
-                                <a href="index.php?page=supplier&amp;hapus_id=<?= $row->id_supplier ?>" onclick="return confirm('Hapus supplier ini?')" class="text-red-600 font-bold">Hapus</a>
+                                <a href="index.php?page=supplier&amp;hapus_id=<?= $row->id_supplier ?>" onclick="return confirmDelete(this.href, 'Hapus supplier ini?')" class="text-red-600 font-bold">Hapus</a>
                             </td>
                         </tr>
                     <?php endforeach; else: ?>
@@ -56,15 +56,15 @@
     </div>
 </main>
 
-<div id="modalSupplier" class="modal fixed inset-0 flex items-center justify-center z-[100]">
-    <div class="modal-overlay absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onclick="closeModal()"></div>
-    <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden">
+<div id="modalSupplier" class="modal fixed inset-0 flex items-start justify-center overflow-y-auto z-[120]">
+    <div class="modal-overlay fixed inset-0 bg-gray-900/50 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded-2xl shadow-2xl z-50 relative mt-8 mb-8">
         <div class="p-8">
             <div class="flex justify-between items-center pb-4 border-b border-gray-100">
                 <p id="modalTitle" class="text-xl font-black">Tambah Supplier Baru</p>
                 <button onclick="closeModal()" class="text-gray-400 hover:text-black text-2xl">&times;</button>
             </div>
-            <form action="index.php?page=supplier" method="POST" class="mt-6 space-y-4">
+            <form action="index.php?page=supplier" method="POST" class="mt-6 space-y-4" onsubmit="return disableSubmit(this)">
                 <input type="hidden" name="id_supplier" id="form_id">
                 <div>
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Nama Supplier</label>

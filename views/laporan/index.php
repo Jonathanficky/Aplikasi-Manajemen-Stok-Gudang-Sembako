@@ -10,12 +10,15 @@
     <div class="border border-gray-900 rounded-2xl p-6 bg-white shadow-sm flex justify-between items-center">
         <div>
             <h3 class="font-bold text-gray-900 text-sm">Unduh Laporan Stok Saat Ini</h3>
-            <p class="text-xs text-gray-500 mt-1">Ekspor data ke dalam format Excel (.xls) untuk dianalisis lebih lanjut.</p>
+            <p class="text-xs text-gray-500 mt-1">Ekspor data ke dalam format Excel atau PDF untuk dianalisis lebih lanjut.</p>
         </div>
-        <a href="index.php?page=export_laporan" class="bg-green-600 text-white px-8 py-3 rounded-xl flex items-center gap-2 font-bold text-sm hover:bg-green-700 transition-all shadow-lg shadow-green-200">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-2m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            Export Excel
-        </a>
+        <div class="flex gap-3">
+            <a href="index.php?page=export_laporan" class="bg-green-600 text-white px-6 py-3 rounded-xl flex items-center gap-2 font-bold text-sm hover:bg-green-700 transition-all shadow-lg shadow-green-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-2m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Export Excel
+            </a>
+
+        </div>
     </div>
 
     <div class="border border-gray-900 rounded-2xl p-8 bg-white shadow-sm min-h-[400px]">

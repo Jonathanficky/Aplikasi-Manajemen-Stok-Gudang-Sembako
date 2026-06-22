@@ -37,7 +37,7 @@
                         <td class="py-4 text-gray-500"><?= htmlspecialchars($k->deskripsi); ?></td>
                         <td class="py-4 text-right">
                             <button onclick="openEditModal('<?= $k->id_kategori ?>', '<?= htmlspecialchars($k->nama_kategori) ?>', '<?= htmlspecialchars($k->deskripsi) ?>')" class="text-blue-600 font-bold mr-4 hover:underline">Edit</button>
-                            <a href="index.php?page=kategori&amp;hapus_id=<?= $k->id_kategori ?>" onclick="return confirm('Hapus kategori ini?')" class="text-red-600 font-bold hover:underline">Hapus</a>
+                            <a href="index.php?page=kategori&amp;hapus_id=<?= $k->id_kategori ?>" onclick="return confirmDelete(this.href, 'Hapus kategori ini?')" class="text-red-600 font-bold hover:underline">Hapus</a>
                         </td>
                     </tr>
                 <?php endforeach; else: ?>
@@ -48,15 +48,15 @@
     </div>
 </main>
 
-<div id="modalKategori" class="modal fixed inset-0 flex items-center justify-center z-[100]">
-    <div class="modal-overlay absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onclick="closeModal()"></div>
-    <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden">
+<div id="modalKategori" class="modal fixed inset-0 flex items-start justify-center overflow-y-auto z-[120]">
+    <div class="modal-overlay fixed inset-0 bg-gray-900/50 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden relative mt-8 mb-8">
         <div class="p-8">
             <div class="flex justify-between items-center pb-4 border-b border-gray-100">
                 <p id="modalTitle" class="text-xl font-black">Tambah Kategori Baru</p>
                 <button onclick="closeModal()" class="text-gray-400 hover:text-black text-2xl">&times;</button>
             </div>
-            <form action="index.php?page=kategori" method="POST" class="mt-6 space-y-5">
+            <form action="index.php?page=kategori" method="POST" class="mt-6 space-y-5" onsubmit="return disableSubmit(this)">
                 <input type="hidden" name="id_kategori" id="form_id">
                 <div>
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Nama Kategori</label>

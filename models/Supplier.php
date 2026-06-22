@@ -88,4 +88,26 @@ class Supplier
         mysqli_stmt_close($stmt);
         return $result;
     }
+
+    public static function getStokAwal(): int
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $q = mysqli_query($koneksi, "SELECT id_supplier FROM supplier WHERE nama_supplier = 'Stok Awal' LIMIT 1");
+        if ($r = mysqli_fetch_assoc($q)) {
+            return (int) $r['id_supplier'];
+        }
+        mysqli_query($koneksi, "INSERT INTO supplier (nama_supplier, no_telp, alamat) VALUES ('Stok Awal', '-', 'Supplier otomatis untuk stok awal barang baru')");
+        return (int) mysqli_insert_id($koneksi);
+    }
+
+    public static function getAdmin(): int
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $q = mysqli_query($koneksi, "SELECT id_supplier FROM supplier WHERE nama_supplier = 'Admin' LIMIT 1");
+        if ($r = mysqli_fetch_assoc($q)) {
+            return (int) $r['id_supplier'];
+        }
+        mysqli_query($koneksi, "INSERT INTO supplier (nama_supplier, no_telp, alamat) VALUES ('Admin', '-', 'Supplier internal untuk penyesuaian stok')");
+        return (int) mysqli_insert_id($koneksi);
+    }
 }

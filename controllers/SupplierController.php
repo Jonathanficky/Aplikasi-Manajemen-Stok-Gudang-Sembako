@@ -1,4 +1,5 @@
 <?php
+// Dibuat oleh Retta - Modul supplierController.php
 class SupplierController
 {
     public function index(): void

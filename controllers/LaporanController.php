@@ -1,4 +1,7 @@
 <?php
+// Menghasilkan laporan stok barang
+public function generateReport()
+
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;

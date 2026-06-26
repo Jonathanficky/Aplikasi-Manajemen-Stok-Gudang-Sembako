@@ -56,6 +56,19 @@ class TransaksiMasuk
         return null;
     }
 
+    public static function monthlySummary(): array
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $result = [];
+        $q = mysqli_query($koneksi, "SELECT DATE_FORMAT(tanggal, '%Y-%m') as bulan, SUM(jumlah * harga_beli) as total_nilai FROM transaksi_masuk GROUP BY bulan ORDER BY bulan ASC");
+        if ($q) {
+            while ($r = mysqli_fetch_assoc($q)) {
+                $result[] = $r;
+            }
+        }
+        return $result;
+    }
+
     public static function total(): int
     {
         $koneksi = Database::getInstance()->getConnection();

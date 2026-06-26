@@ -1,3 +1,6 @@
+<?php
+// Halaman untuk menampilkan laporan data stok dan transaksi.
+?>
 <?php $title = 'Laporan - Toko Sembako'; $activeMenu = 'laporan'; ?>
 <?php include __DIR__ . '/../layouts/header.php'; ?>
 

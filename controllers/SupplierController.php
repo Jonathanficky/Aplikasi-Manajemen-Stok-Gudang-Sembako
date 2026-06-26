@@ -1,5 +1,5 @@
 <?php
-// Dibuat oleh Retta - Modul supplierController.php
+// Menampilkan daftar supplier
 class SupplierController
 {
     public function index(): void

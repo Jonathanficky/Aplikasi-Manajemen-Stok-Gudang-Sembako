@@ -1,3 +1,7 @@
+<?php
+// View ini digunakan untuk menampilkan daftar supplier dan fitur pencarian supplier.
+?>
+<?php $title = 'Supplier - Toko Sembako'; $activeMenu = 'supplier'; ?>
 <?php $title = 'Supplier - Toko Sembako'; $activeMenu = 'supplier'; ?>
 <?php include __DIR__ . '/../layouts/header.php'; ?>
 

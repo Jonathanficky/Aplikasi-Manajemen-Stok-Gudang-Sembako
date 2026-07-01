@@ -5,19 +5,68 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
+
 class LaporanController
 {
     public function index(): void
     {
         Auth::checkLogin();
         $user = Auth::user();
+
+        $tahun = isset($_GET['tahun']) ? (int) $_GET['tahun'] : (int) date('Y');
+        if ($tahun < 2020 || $tahun > 2099) {
+            $tahun = (int) date('Y');
+        }
+
         $laporanList = Barang::allAsc();
+
+        $monthlyPenjualan = TransaksiKeluar::monthlyPenjualan();
+        $monthlyPembelian = TransaksiMasuk::monthlySummary();
+
+        $penjualanByBulan = [];
+        foreach ($monthlyPenjualan as $m) {
+            $t = strtotime($m['bulan'] . '-01');
+            if (date('Y', $t) == $tahun) {
+                $penjualanByBulan[(int) date('m', $t)] = (int) $m['total_nilai'];
+            }
+        }
+
+        $pembelianByBulan = [];
+        foreach ($monthlyPembelian as $m) {
+            $t = strtotime($m['bulan'] . '-01');
+            if (date('Y', $t) == $tahun) {
+                $pembelianByBulan[(int) date('m', $t)] = (int) $m['total_nilai'];
+            }
+        }
+
+        $bulanList = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        $labaRugiBulan = [];
+        $totalPenjualanBulan = 0;
+        $totalPembelianBulan = 0;
+        for ($b = 1; $b <= 12; $b++) {
+            $jual = $penjualanByBulan[$b] ?? 0;
+            $beli = $pembelianByBulan[$b] ?? 0;
+            $labaRugiBulan[] = [
+                'bulan' => $bulanList[$b - 1],
+                'penjualan' => $jual,
+                'pembelian' => $beli,
+                'laba_rugi' => $jual - $beli,
+            ];
+            $totalPenjualanBulan += $jual;
+            $totalPembelianBulan += $beli;
+        }
 
         View::render('laporan/index', [
             'nama_user' => $user['nama_lengkap'],
             'role_user' => $user['role'],
             'laporanList' => $laporanList,
             'jmlKritis' => Barang::totalStokKritis(),
+            'labaRugiBulan' => $labaRugiBulan,
+            'totalPenjualanBulan' => $totalPenjualanBulan,
+            'totalPembelianBulan' => $totalPembelianBulan,
+            'totalLabaRugi' => $totalPenjualanBulan - $totalPembelianBulan,
+            'tahunTerpilih' => $tahun,
+            'tahunSekarang' => (int) date('Y'),
         ]);
     }
 

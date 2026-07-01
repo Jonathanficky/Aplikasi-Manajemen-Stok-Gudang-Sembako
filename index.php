@@ -1,11 +1,4 @@
 <?php
-/**
- * ==============================================
- * Nama Anggota  : Ariyan
- * Nama File     : index.php
- * Deskripsi     : Entry point & router utama aplikasi (switch based routing)
- * ==============================================
- */
 require_once __DIR__ . '/autoload.php';
 Session::start();
 
@@ -43,11 +36,6 @@ switch ($page) {
         } else {
             $controller->index();
         }
-        break;
-
-    case 'barang_export_kategori':
-        $controller = new BarangController();
-        $controller->exportByKategori();
         break;
 
     case 'kategori':

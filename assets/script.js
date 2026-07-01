@@ -81,140 +81,8 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    /*/ ==========================================
-    // 4. FITUR MODAL "TAMBAH DATA" (POPUP FORM)
-    // ==========================================
-    const allButtons = document.querySelectorAll('button');
-    let btnTambah = null;
-    allButtons.forEach(btn => {
-        if (btn.innerText.includes('Tambah') && btn.innerText.includes('+')) {
-            btnTambah = btn;
-        }
-    }); */
-
-    if (btnTambah) {
-        btnTambah.addEventListener('click', function() {
-            let title = "";
-            let formHtml = "";
-
-            if (currentPage.includes('kategori')) {
-                title = "Tambah Kategori Baru";
-                formHtml = `
-                    <div class="mb-4"><label class="block text-xs font-bold mb-1 text-gray-700">Nama Kategori</label><input type="text" id="input1" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-black outline-none" placeholder="Misal: Minuman"></div>
-                    <div class="mb-4"><label class="block text-xs font-bold mb-1 text-gray-700">Deskripsi</label><input type="text" id="input2" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:border-black outline-none" placeholder="Deskripsi kategori..."></div>
-                `;
-            } else if (currentPage.includes('barang')) {
-                title = "Tambah Barang Baru";
-                formHtml = `
-                    <div class="mb-4"><label class="block text-xs font-bold mb-1 text-gray-700">Kode Barang</label><input type="text" id="input1" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none" placeholder="BRG-001"></div>
-                    <div class="mb-4"><label class="block text-xs font-bold mb-1 text-gray-700">Nama Barang</label><input type="text" id="input2" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none" placeholder="Nama produk..."></div>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div><label class="block text-xs font-bold mb-1 text-gray-700">Stok Awal</label><input type="number" id="input3" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none" placeholder="0"></div>
-                        <div><label class="block text-xs font-bold mb-1 text-gray-700">Harga</label><input type="text" id="input4" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none" placeholder="Rp ..."></div>
-                    </div>
-                `;
-            } else if (currentPage.includes('supplier')) {
-                title = "Tambah Supplier Baru";
-                formHtml = `
-                    <div class="mb-4"><label class="block text-xs font-bold mb-1 text-gray-700">Nama Supplier</label><input type="text" id="input1" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none" placeholder="PT / CV ..."></div>
-                    <div class="mb-4"><label class="block text-xs font-bold mb-1 text-gray-700">No. Telpon</label><input type="text" id="input2" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none" placeholder="08..."></div>
-                    <div class="mb-4"><label class="block text-xs font-bold mb-1 text-gray-700">Alamat Lengkap</label><textarea id="input3" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none" rows="2" placeholder="Alamat..."></textarea></div>
-                `;
-            } else if (currentPage.includes('transaksi')) {
-                title = "Catat Transaksi Baru";
-                formHtml = `
-                    <div class="mb-4"><label class="block text-xs font-bold mb-1 text-gray-700">Tanggal</label><input type="date" id="input1" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none"></div>
-                    <div class="mb-4"><label class="block text-xs font-bold mb-1 text-gray-700">Nama Barang</label><input type="text" id="input2" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none" placeholder="Pilih barang..."></div>
-                    <div class="mb-4"><label class="block text-xs font-bold mb-1 text-gray-700">Jumlah Item</label><input type="number" id="input3" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none" placeholder="0"></div>
-                `;
-            } else {
-                return; 
-            }
-
-            const modalOverlay = document.createElement('div');
-            modalOverlay.className = "fixed inset-0 bg-black/60 z-[100] flex items-center justify-center backdrop-blur-sm";
-            modalOverlay.id = "customModal";
-            
-            modalOverlay.innerHTML = `
-                <div class="bg-white rounded-2xl p-7 w-full max-w-md shadow-2xl">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-extrabold text-xl text-gray-900">${title}</h3>
-                        <button id="closeModal" class="text-gray-400 hover:text-red-500 font-bold text-xl leading-none">&times;</button>
-                    </div>
-                    <div>
-                        ${formHtml}
-                    </div>
-                    <div class="mt-8 flex justify-end gap-3">
-                        <button id="cancelModal" class="px-5 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl text-sm hover:bg-gray-200 transition-colors">Batal</button>
-                        <button id="saveModal" class="px-5 py-2.5 bg-[#05051a] text-white font-bold rounded-xl text-sm hover:bg-black transition-colors shadow-lg">Simpan Data</button>
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(modalOverlay);
-
-            const closeFn = () => document.body.removeChild(modalOverlay);
-            document.getElementById('closeModal').addEventListener('click', closeFn);
-            document.getElementById('cancelModal').addEventListener('click', closeFn);
-
-            document.getElementById('saveModal').addEventListener('click', function() {
-                const tbody = document.querySelector('tbody');
-                if(!tbody) { closeFn(); return; }
-
-                let existingRows = Array.from(tbody.querySelectorAll('tr')).filter(tr => tr.innerText.trim() !== '').length;
-                let no = existingRows + 1;
-
-                let newRow = document.createElement('tr');
-                newRow.className = "border-b border-gray-200 hover:bg-gray-50 transition-colors text-gray-800";
-                
-                if (currentPage.includes('kategori')) {
-                    let v1 = document.getElementById('input1').value || 'Tanpa Nama';
-                    let v2 = document.getElementById('input2').value || '-';
-                    newRow.innerHTML = `<td class="py-4 px-2">${no}</td><td class="py-4 px-2 font-bold">${v1}</td><td class="py-4 px-2 text-gray-500">${v2}</td><td class="py-4 px-2 text-right"><button class="text-blue-600 font-bold text-xs mr-3">Edit</button><button class="text-red-600 font-bold text-xs">Hapus</button></td>`;
-                } 
-                else if (currentPage.includes('barang')) {
-                    let v1 = document.getElementById('input1').value || 'NEW';
-                    let v2 = document.getElementById('input2').value || 'Item Baru';
-                    let v3 = document.getElementById('input3').value || '0';
-                    let v4 = document.getElementById('input4').value || 'Rp 0';
-                    newRow.innerHTML = `<td class="py-4 px-2">${no}</td><td class="py-4 px-2 text-gray-500 font-mono text-xs">${v1}</td><td class="py-4 px-2 font-bold">${v2}</td><td class="py-4 px-2">-</td><td class="py-4 px-2 font-medium">${v3}</td><td class="py-4 px-2">${v4}</td><td class="py-4 px-2"><span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-[10px] font-bold">Aman</span></td><td class="py-4 px-2 text-right"><button class="text-blue-600 font-bold text-xs">Edit</button></td>`;
-                } 
-                else if (currentPage.includes('supplier')) {
-                    let v1 = document.getElementById('input1').value || 'Supplier Baru';
-                    let v2 = document.getElementById('input2').value || '-';
-                    let v3 = document.getElementById('input3').value || '-';
-                    newRow.innerHTML = `<td class="py-4 px-2">${no}</td><td class="py-4 px-2 font-mono text-xs text-gray-500">SPL-NEW</td><td class="py-4 px-2 font-bold">${v1}</td><td class="py-4 px-2">${v3}</td><td class="py-4 px-2">${v2}</td><td class="py-4 px-2">-</td><td class="py-4 px-2 text-right"><button class="text-blue-600 font-bold text-xs">Edit</button></td>`;
-                }
-                else if (currentPage.includes('transaksi')) {
-                    let v1 = document.getElementById('input1').value || 'Hari ini';
-                    let v2 = document.getElementById('input2').value || 'Item';
-                    let v3 = document.getElementById('input3').value || '0';
-                    let color = currentPage.includes('masuk') ? 'text-green-600' : 'text-red-600';
-                    let sign = currentPage.includes('masuk') ? '+' : '-';
-                    newRow.innerHTML = `<td class="py-4 px-2">${no}</td><td class="py-4 px-2">${v1}</td><td class="py-4 px-2 font-bold">${v2}</td><td class="py-4 px-2 ${color} font-extrabold">${sign}${v3}</td><td class="py-4 px-2">-</td><td class="py-4 px-2">-</td><td class="py-4 px-2 font-medium">Admin</td>`;
-                }
-
-                tbody.prepend(newRow);
-
-                const emptyText = document.querySelector('.flex.justify-center.items-center.mt-12');
-                if(emptyText) emptyText.remove();
-
-                const totalText = document.querySelector('h3 + p.text-xs');
-                if(totalText) totalText.innerText = `Total: ${no} Data`;
-
-                closeFn();
-                setTimeout(() => alert('Data berhasil ditambahkan ke tabel!'), 100);
-            });
-        });
-    }
-
 });
 
-window.addEventListener('pageshow', function (event) {
-    if (event.persisted) {
-        window.location.reload();
-    }
-});     
 // Ambil elemen yang dibutuhkan (khusus halaman transaksi_keluar)
 const tombolSimpan = document.querySelector('button[name="simpan_keluar"]');
 
@@ -241,4 +109,30 @@ if (tombolSimpan) {
 
     inputJumlah.addEventListener('input', validasiInstan);
     selectBarang.addEventListener('change', validasiInstan);
+}
+
+// ==========================================
+// 4. DISABLE SUBMIT BUTTON + SPINNER
+// ==========================================
+function disableSubmit(form) {
+    var btn = form.querySelector('button[type="submit"]');
+    if (btn) {
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.6';
+        btn.innerHTML = '<svg class="spinner-inline" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-dasharray="31.4 31.4" stroke-linecap="round" stroke-dashoffset="0"/></svg> Menyimpan...';
+    }
+    return true;
+}
+
+// ==========================================
+// 5. KONFIRMASI DELETE MODAL
+// ==========================================
+function confirmDelete(url, msg) {
+    document.getElementById('confirmMsg').textContent = msg || 'Hapus data ini?';
+    document.getElementById('confirmLink').href = url;
+    document.getElementById('confirmModal').classList.remove('hidden');
+    return false;
+}
+function closeConfirmModal() {
+    document.getElementById('confirmModal').classList.add('hidden');
 }

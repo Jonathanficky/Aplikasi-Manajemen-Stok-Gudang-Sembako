@@ -1,11 +1,4 @@
 <?php
-/**
- * ==============================================
- * Nama Anggota  : Ariyan
- * Nama File     : helpers/Session.php
- * Deskripsi     : Manajemen session (start, set, get, destroy, isLoggedIn)
- * ==============================================
- */
 class Session
 {
     public static function start(): void

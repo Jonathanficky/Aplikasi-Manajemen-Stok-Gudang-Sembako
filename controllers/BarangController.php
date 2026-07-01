@@ -1,15 +1,9 @@
 <?php
-/**
- * ==============================================
- * Nama Anggota  : Ariyan
- * Nama File     : controllers/BarangController.php
- * ==============================================
- */
 class BarangController
 {
     public function index(): void
     {
-        Auth::checkLogin();
+        Auth::checkAdmin();
         $user = Auth::user();
         $kategoriId = (int) ($_GET['kategori'] ?? 0);
 
@@ -40,7 +34,7 @@ class BarangController
 
     public function simpan(): void
     {
-        Auth::checkLogin();
+        Auth::checkAdmin();
 
         $kode = trim($_POST['kode_barang'] ?? '');
         if (empty($kode)) {
@@ -105,7 +99,7 @@ class BarangController
 
     public function update(): void
     {
-        Auth::checkLogin();
+        Auth::checkAdmin();
         $barang = Barang::find($_POST['id_barang']);
         if ($barang) {
             $user = Auth::user();
@@ -157,7 +151,7 @@ class BarangController
 
     public function hapus(int $id): void
     {
-        Auth::checkLogin();
+        Auth::checkAdmin();
         $barang = Barang::find($id);
         if ($barang) {
             $barang->delete();
@@ -169,71 +163,5 @@ class BarangController
         exit();
     }
 
-    public function exportByKategori(): void
-    {
-        Auth::checkLogin();
-        $kategoriId = (int) ($_GET['kategori'] ?? 0);
-        if ($kategoriId <= 0) {
-            header("location:index.php?page=barang");
-            exit();
-        }
 
-        $kategori = Kategori::find($kategoriId);
-        if (!$kategori) {
-            header("location:index.php?page=barang");
-            exit();
-        }
-
-        while (ob_get_level()) { ob_end_clean(); }
-
-        $barangList = Barang::byKategori($kategoriId);
-
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $sheet->setCellValue('A1', 'LAPORAN BARANG PER KATEGORI: ' . strtoupper($kategori->nama_kategori));
-        $sheet->mergeCells('A1:F1');
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
-        $sheet->setCellValue('A2', 'Dicetak pada: ' . date('d M Y H:i'));
-        $sheet->mergeCells('A2:F2');
-        $sheet->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
-        $headers = ['No', 'Kode', 'Nama Barang', 'Stok', 'Stok Min', 'Harga Beli'];
-        $cols = ['A', 'B', 'C', 'D', 'E', 'F'];
-        foreach ($headers as $i => $h) {
-            $cell = $cols[$i] . '4';
-            $sheet->setCellValue($cell, $h);
-            $sheet->getStyle($cell)->getFont()->setBold(true);
-            $sheet->getStyle($cell)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle($cell)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-        }
-
-        $rowNum = 5;
-        $no = 1;
-        foreach ($barangList as $row) {
-            $sheet->setCellValue('A' . $rowNum, $no);
-            $sheet->setCellValue('B' . $rowNum, $row->kode_barang);
-            $sheet->setCellValue('C' . $rowNum, $row->nama_barang);
-            $sheet->setCellValue('D' . $rowNum, $row->stok);
-            $sheet->setCellValue('E' . $rowNum, $row->stok_min);
-            $sheet->setCellValue('F' . $rowNum, $row->harga_beli);
-            $sheet->getStyle('A' . $rowNum . ':F' . $rowNum)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-            $rowNum++;
-            $no++;
-        }
-
-        foreach (range('A', 'F') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="Barang_' . $kategori->nama_kategori . '_' . date('Y-m-d') . '.xlsx"');
-        header('Cache-Control: max-age=0');
-
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit();
-    }
 }

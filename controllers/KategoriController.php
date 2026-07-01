@@ -3,7 +3,7 @@ class KategoriController
 {
     public function index(): void
     {
-        Auth::checkLogin();
+        Auth::checkAdmin();
         $user = Auth::user();
         $kategoriList = Kategori::all();
 
@@ -17,7 +17,13 @@ class KategoriController
 
     public function simpan(): void
     {
-        Auth::checkLogin();
+        Auth::checkAdmin();
+        $nama = trim($_POST['nama_kategori'] ?? '');
+        if (empty($nama)) {
+            Session::setFlash('error', 'Nama kategori harus diisi!');
+            header("location:index.php?page=kategori");
+            exit();
+        }
         $kategori = new Kategori($_POST);
         $kategori->save();
         Session::setFlash('success', 'Kategori berhasil ditambahkan!');
@@ -27,7 +33,13 @@ class KategoriController
 
     public function update(): void
     {
-        Auth::checkLogin();
+        Auth::checkAdmin();
+        $nama = trim($_POST['nama_kategori'] ?? '');
+        if (empty($nama)) {
+            Session::setFlash('error', 'Nama kategori harus diisi!');
+            header("location:index.php?page=kategori");
+            exit();
+        }
         $kategori = Kategori::find($_POST['id_kategori']);
         if ($kategori) {
             $kategori->nama_kategori = $_POST['nama_kategori'];
@@ -43,7 +55,7 @@ class KategoriController
 
     public function hapus(int $id): void
     {
-        Auth::checkLogin();
+        Auth::checkAdmin();
         $kategori = Kategori::find($id);
         if ($kategori) {
             $kategori->delete();

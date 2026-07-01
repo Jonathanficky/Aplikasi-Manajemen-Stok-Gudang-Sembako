@@ -1,19 +1,12 @@
 <?php
-/**
- * ==============================================
- * Nama Anggota  : Ariyan
- * Nama File     : controllers/DashboardController.php
- * Deskripsi     : Controller untuk halaman dashboard (ringkasan & notifikasi)
- * ==============================================
- */
 class DashboardController
 {
     public function index(): void
     {
         Auth::checkLogin();
         $user = Auth::user();
-        $jmlKritis = Barang::totalStokKritis();
         $barangKritis = Barang::stokKritis();
+        $jmlKritis = count($barangKritis);
 
         $koneksi = Database::getInstance()->getConnection();
         $qTrx = mysqli_query($koneksi, "SELECT t.tanggal, b.nama_barang, t.jumlah 
@@ -24,20 +17,22 @@ class DashboardController
             $transaksiTerbaru[] = $r;
         }
 
+        $totalPenjualan = TransaksiKeluar::totalPenjualan();
+        $totalPembelian = TransaksiMasuk::totalNilai();
+        $totalAset = Barang::totalNilaiAsetAll();
+
         $kategoriStok = Kategori::allWithStokCount();
         $chartLabels = [];
         $chartData = [];
+        $chartDetail = [];
         foreach ($kategoriStok as $ks) {
             $chartLabels[] = $ks['nama_kategori'];
             $chartData[] = (int) $ks['total_stok'];
-        }
-
-        $monthly = TransaksiMasuk::monthlySummary();
-        $chartMonthlyLabels = [];
-        $chartMonthlyData = [];
-        foreach (array_reverse($monthly) as $m) {
-            $chartMonthlyLabels[] = date('M Y', strtotime($m['bulan'] . '-01'));
-            $chartMonthlyData[] = (int) $m['total_nilai'];
+            $chartDetail[] = [
+                'nama' => $ks['nama_kategori'],
+                'stok' => (int) $ks['total_stok'],
+                'barang' => (int) $ks['total_barang'],
+            ];
         }
 
         View::render('dashboard/index', [
@@ -47,12 +42,15 @@ class DashboardController
             'jmlKritis' => $jmlKritis,
             'jmlMasuk' => TransaksiMasuk::total(),
             'jmlKeluar' => TransaksiKeluar::total(),
+            'totalAset' => $totalAset,
+            'totalPenjualan' => $totalPenjualan,
+            'totalPembelian' => $totalPembelian,
+            'labaRugi' => $totalPenjualan - $totalPembelian,
             'barangKritis' => $barangKritis,
             'transaksiTerbaru' => $transaksiTerbaru,
             'chartLabels' => json_encode($chartLabels),
             'chartData' => json_encode($chartData),
-            'chartMonthlyLabels' => json_encode($chartMonthlyLabels),
-            'chartMonthlyData' => json_encode($chartMonthlyData),
+            'chartDetail' => $chartDetail,
         ]);
     }
 }

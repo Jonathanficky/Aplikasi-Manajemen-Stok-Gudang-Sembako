@@ -1,11 +1,4 @@
 <?php
-/**
- * ==============================================
- * Nama Anggota  : Ariyan
- * Nama File     : helpers/Auth.php
- * Deskripsi     : Helper autentikasi (check login, user info, role)
- * ==============================================
- */
 class Auth
 {
     public static function checkLogin(): void
@@ -39,5 +32,15 @@ class Auth
     public static function isAdmin(): bool
     {
         return Session::get('role') === 'admin';
+    }
+
+    public static function checkAdmin(): void
+    {
+        self::checkLogin();
+        if (!self::isAdmin()) {
+            Session::setFlash('error', 'Akses ditolak! Hanya untuk admin.');
+            header("location:index.php?page=dashboard");
+            exit();
+        }
     }
 }

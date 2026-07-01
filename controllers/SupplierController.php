@@ -1,10 +1,9 @@
 <?php
-// Menampilkan daftar supplier
 class SupplierController
 {
     public function index(): void
     {
-        Auth::checkLogin();
+        Auth::checkAdmin();
         $user = Auth::user();
         $supplierList = Supplier::all();
 
@@ -19,7 +18,13 @@ class SupplierController
 
     public function simpan(): void
     {
-        Auth::checkLogin();
+        Auth::checkAdmin();
+        $nama = trim($_POST['nama_supplier'] ?? '');
+        if (empty($nama)) {
+            Session::setFlash('error', 'Nama supplier harus diisi!');
+            header("location:index.php?page=supplier");
+            exit();
+        }
         $supplier = new Supplier($_POST);
         $supplier->save();
         Session::setFlash('success', 'Supplier berhasil ditambahkan!');
@@ -29,7 +34,13 @@ class SupplierController
 
     public function update(): void
     {
-        Auth::checkLogin();
+        Auth::checkAdmin();
+        $nama = trim($_POST['nama_supplier'] ?? '');
+        if (empty($nama)) {
+            Session::setFlash('error', 'Nama supplier harus diisi!');
+            header("location:index.php?page=supplier");
+            exit();
+        }
         $supplier = Supplier::find($_POST['id_supplier']);
         if ($supplier) {
             $supplier->nama_supplier = $_POST['nama_supplier'];
@@ -46,7 +57,7 @@ class SupplierController
 
     public function hapus(int $id): void
     {
-        Auth::checkLogin();
+        Auth::checkAdmin();
         $supplier = Supplier::find($id);
         if ($supplier) {
             $supplier->delete();

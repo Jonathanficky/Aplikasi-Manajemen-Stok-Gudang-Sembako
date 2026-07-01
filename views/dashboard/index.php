@@ -1,12 +1,4 @@
-<?php
-/**
- * ==============================================
- * Nama Anggota  : Ariyan
- * Nama File     : views/dashboard/index.php
- * Deskripsi     : Tampilan dashboard dengan kartu statistik & tabel stok kritis
- * ==============================================
- */
-$title = 'Dashboard - Toko Sembako'; $activeMenu = 'dashboard'; ?>
+<?php $title = 'Dashboard - Toko Sembako'; $activeMenu = 'dashboard'; ?>
 <?php include __DIR__ . '/../layouts/header.php'; ?>
 
 <main class="p-8 space-y-6">
@@ -20,10 +12,10 @@ $title = 'Dashboard - Toko Sembako'; $activeMenu = 'dashboard'; ?>
             <span class="text-gray-500 font-medium">Total Barang</span>
             <span class="text-3xl font-black text-gray-900 mt-6"><?= $jmlBarang ?> <span class="text-xs text-gray-400 font-normal">Item</span></span>
         </div>
-        <div class="border <?= ($jmlKritis > 0) ? 'border-red-500 bg-red-50' : 'border-gray-900 bg-white' ?> rounded-2xl p-6 flex flex-col justify-between min-h-[140px]">
+        <a href="index.php?page=barang" class="border <?= ($jmlKritis > 0) ? 'border-red-500 bg-red-50' : 'border-gray-900 bg-white' ?> rounded-2xl p-6 flex flex-col justify-between min-h-[140px] cursor-pointer hover:shadow-md transition-shadow">
             <span class="<?= ($jmlKritis > 0) ? 'text-red-500' : 'text-gray-500' ?> font-medium">Stok Rendah</span>
             <span class="text-3xl font-black <?= ($jmlKritis > 0) ? 'text-red-600' : 'text-gray-900' ?> mt-6"><?= $jmlKritis ?> <span class="text-xs font-normal">Perlu diisi</span></span>
-        </div>
+        </a>
         <div class="border border-gray-900 rounded-2xl bg-white p-6 flex flex-col justify-between min-h-[140px]">
             <span class="text-gray-500 font-medium">Transaksi Masuk</span>
             <span class="text-3xl font-black text-gray-900 mt-6"><?= $jmlMasuk ?> <span class="text-xs text-gray-400 font-normal">Pembelian</span></span>
@@ -34,29 +26,65 @@ $title = 'Dashboard - Toko Sembako'; $activeMenu = 'dashboard'; ?>
         </div>
     </div>
 
-    <?php if ($jmlKritis > 0): ?>
-    <div class="border border-red-500 bg-white p-4 flex items-center gap-4 rounded-xl shadow-sm">
-        <div class="bg-red-500 text-white p-1.5 rounded">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="border border-gray-900 rounded-2xl bg-white p-6 flex flex-col justify-between min-h-[140px]">
+            <span class="text-gray-500 font-medium text-sm">Total Nilai Aset</span>
+            <span class="text-2xl font-black text-gray-900 mt-4">IDR <?= number_format($totalAset, 0, ',', '.') ?></span>
         </div>
-        <div>
-            <h4 class="text-red-600 font-bold text-sm leading-none">Peringatan Stok Rendah</h4>
-            <p class="text-[10px] text-red-500 mt-1 uppercase">Terdapat <?= $jmlKritis ?> barang dengan stok di bawah batas minimum. Segera lakukan pengadaan.</p>
+        <div class="border border-gray-900 rounded-2xl bg-white p-6 flex flex-col justify-between min-h-[140px]">
+            <span class="text-gray-500 font-medium text-sm">Total Penjualan</span>
+            <span class="text-2xl font-black text-emerald-600 mt-4">IDR <?= number_format($totalPenjualan, 0, ',', '.') ?></span>
+        </div>
+        <div class="border <?= $labaRugi >= 0 ? 'border-emerald-500 bg-emerald-50' : 'border-red-500 bg-red-50' ?> rounded-2xl p-6 flex flex-col justify-between min-h-[140px]">
+            <span class="<?= $labaRugi >= 0 ? 'text-emerald-600' : 'text-red-600' ?> font-medium text-sm">Laba / Rugi</span>
+            <span class="text-2xl font-black <?= $labaRugi >= 0 ? 'text-emerald-700' : 'text-red-700' ?> mt-4">IDR <?= number_format(abs($labaRugi), 0, ',', '.') ?> <span class="text-xs font-normal"><?= $labaRugi >= 0 ? '💰 Untung' : '🔴 Rugi' ?></span></span>
         </div>
     </div>
-    <?php endif; ?>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="space-y-3">
-            <h3 class="font-bold text-gray-900 text-sm">Grafik Stok per Kategori</h3>
-            <div class="border border-gray-900 rounded-2xl p-5 bg-white min-h-[250px]">
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3 border border-gray-900 rounded-2xl p-5 bg-white">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+                <h3 class="font-bold text-gray-900 text-sm">Stok per Kategori</h3>
+            </div>
+            <div class="relative" style="height: 260px;">
                 <canvas id="chartStok"></canvas>
             </div>
         </div>
-        <div class="space-y-3">
-            <h3 class="font-bold text-gray-900 text-sm">Grafik Transaksi Bulanan</h3>
-            <div class="border border-gray-900 rounded-2xl p-5 bg-white min-h-[250px]">
-                <canvas id="chartTransaksi"></canvas>
+        <div class="lg:col-span-2 border border-gray-900 rounded-2xl p-5 bg-white flex flex-col">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                <h3 class="font-bold text-gray-900 text-sm">Rincian per Kategori</h3>
+            </div>
+            <div class="flex-1 overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="text-gray-400 font-bold uppercase tracking-wider border-b border-gray-100">
+                            <th class="pb-2 pr-2">Kategori</th>
+                            <th class="pb-2 px-2 text-right">Stok</th>
+                            <th class="pb-2 pl-2 text-right">Barang</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php $totalStok = 0; $totalBarang = 0; ?>
+                        <?php foreach ($chartDetail as $i => $cd): ?>
+                        <?php $totalStok += $cd['stok']; $totalBarang += $cd['barang']; ?>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors kategori-row" data-index="<?= $i ?>">
+                            <td class="py-3 pr-2">
+                                <span class="inline-block w-2.5 h-2.5 rounded-full mr-2 align-middle" style="background: <?= ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#06B6D4','#F97316'][$i % 8] ?>"></span>
+                                <span class="font-semibold text-gray-800"><?= htmlspecialchars($cd['nama']) ?></span>
+                            </td>
+                            <td class="py-3 px-2 text-right font-bold text-gray-900"><?= number_format($cd['stok'], 0, ',', '.') ?></td>
+                            <td class="py-3 pl-2 text-right text-gray-600"><?= $cd['barang'] ?> item</td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <tr class="font-bold text-gray-900 bg-gray-50/50">
+                            <td class="py-3 pr-2">Total</td>
+                            <td class="py-3 px-2 text-right"><?= number_format($totalStok, 0, ',', '.') ?></td>
+                            <td class="py-3 pl-2 text-right"><?= $totalBarang ?> item</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -105,44 +133,64 @@ $title = 'Dashboard - Toko Sembako'; $activeMenu = 'dashboard'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    new Chart(document.getElementById('chartStok'), {
-        type: 'bar',
-        data: {
-            labels: <?= $chartLabels ?>,
-            datasets: [{
-                label: 'Total Stok',
-                data: <?= $chartData ?>,
-                backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                borderColor: 'rgba(59, 130, 246, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-        }
-    });
+var COLORS = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#06B6D4','#F97316'];
 
-    new Chart(document.getElementById('chartTransaksi'), {
-        type: 'line',
-        data: {
-            labels: <?= $chartMonthlyLabels ?>,
-            datasets: [{
-                label: 'Total Nilai (IDR)',
-                data: <?= $chartMonthlyData ?>,
-                borderColor: 'rgba(16, 185, 129, 1)',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                fill: true,
-                tension: 0.3
-            }]
+var chartStok = new Chart(document.getElementById('chartStok'), {
+    type: 'doughnut',
+    data: {
+        labels: <?= $chartLabels ?>,
+        datasets: [{
+            data: <?= $chartData ?>,
+            backgroundColor: COLORS,
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: { padding: 16, usePointStyle: true, pointStyle: 'circle', font: { size: 11 } }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(ctx) {
+                        var total = ctx.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                        var pct = ((ctx.parsed / total) * 100).toFixed(1);
+                        return ' ' + ctx.label + ': ' + ctx.parsed + ' stok (' + pct + '%)';
+                    }
+                }
+            }
         },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
+        animation: { animateRotate: true },
+        onHover: function(e, el) {
+            var index = el.length ? el[0].element.$context.dataIndex : -1;
+document.querySelectorAll('.kategori-row').forEach(function(row, i) {
+                row.style.opacity = index === -1 || i === index ? '1' : '0.5';
+            });
         }
+    }
+});
+
+document.querySelectorAll('.kategori-row').forEach(function(row, i) {
+    row.addEventListener('mouseenter', function() {
+        chartStok.setActiveElements([{datasetIndex: 0, index: i}]);
+        chartStok.draw();
+        row.style.opacity = '1';
+        document.querySelectorAll('.kategori-row').forEach(function(r, j) {
+            if (j !== i) r.style.opacity = '0.5';
+        });
     });
+    row.addEventListener('mouseleave', function() {
+        chartStok.setActiveElements([]);
+        chartStok.draw();
+        document.querySelectorAll('.kategori-row').forEach(function(r) {
+            r.style.opacity = '1';
+        });
+    });
+});
 </script>
 
 <?php include __DIR__ . '/../layouts/footer.php'; ?>

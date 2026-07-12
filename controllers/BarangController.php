@@ -29,6 +29,7 @@ class BarangController
             'jmlKritis' => $totalKritis,
             'stokKritis' => $stokKritis,
             'selectedKategori' => $kategoriId,
+            'kodeBaru' => Barang::generateKodeBaru(),
         ]);
     }
 

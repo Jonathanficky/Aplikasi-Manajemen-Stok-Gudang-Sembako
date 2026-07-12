@@ -20,15 +20,9 @@
             <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Hutang Berjalan</p>
             <h3 class="text-2xl font-black text-gray-900 mt-2">IDR <?= number_format($totalHutangBerjalan, 0, ',', '.') ?></h3>
         </div>
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-            <div>
-                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Faktur Jatuh Tempo</p>
-                <h3 class="text-2xl font-black text-gray-900 mt-2">(<?= $fakturJatuhTempo ?>)</h3>
-            </div>
-            <div class="relative bg-red-50 p-3 rounded-xl text-red-500">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span class="absolute -top-1 -right-1 flex h-3 w-3 rounded-full bg-red-500"></span>
-            </div>
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
+            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Faktur Jatuh Tempo</p>
+            <h3 class="text-2xl font-black text-gray-900 mt-2">(<?= $fakturJatuhTempo ?>)</h3>
         </div>
     </div>
 
@@ -37,6 +31,30 @@
             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             <input type="text" id="cariTransaksi" placeholder="Cari transaksi..." class="bg-transparent border-none outline-none text-sm w-full text-gray-600">
         </div>
+    </div>
+
+    <div class="border border-gray-100 rounded-2xl p-6 bg-white shadow-sm overflow-x-auto">
+        <h3 class="font-bold text-gray-800 text-sm mb-4 uppercase tracking-wider">Ringkasan Bulanan</h3>
+        <table class="w-full text-left whitespace-nowrap">
+            <thead>
+                <tr class="text-gray-400 font-bold text-[11px] uppercase border-b border-gray-100">
+                    <th class="pb-3 px-3">Bulan</th>
+                    <th class="pb-3 px-3 text-right">Total Transaksi</th>
+                    <th class="pb-3 px-3 text-right">Total Nilai</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (count($monthlySummary) > 0): foreach ($monthlySummary as $m): ?>
+                    <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors text-sm">
+                        <td class="py-3 px-3 font-bold text-gray-900"><?= date('F Y', strtotime($m['bulan'] . '-01')) ?></td>
+                        <td class="py-3 px-3 text-right text-gray-600"><?= $m['total_transaksi'] ?> faktur</td>
+                        <td class="py-3 px-3 text-right font-bold text-gray-900">IDR <?= number_format($m['total_nilai'], 0, ',', '.') ?></td>
+                    </tr>
+                <?php endforeach; else: ?>
+                    <tr><td colspan="3" class="py-6 text-center text-gray-400 font-medium text-sm">Belum ada data bulanan.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </div>
 
     <div class="border border-gray-100 rounded-2xl p-6 bg-white shadow-sm min-h-[300px] overflow-x-auto">
@@ -49,6 +67,7 @@
                     <th class="pb-3 px-3">Barang (Qty)</th>
                     <th class="pb-3 px-3">Total</th>
                     <th class="pb-3 px-3 text-center">Status</th>
+                    <th class="pb-3 px-3">Keterangan</th>
                     <th class="pb-3 px-3 text-right">Aksi</th>
                 </tr>
             </thead>
@@ -59,33 +78,44 @@
                     <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition-colors text-sm">
                         <td class="py-4 px-3 font-bold text-gray-900">INV-2026-<?= sprintf('%03d', $row->id_masuk); ?></td>
                         <td class="py-4 px-3 text-gray-500"><?= date('Y-m-d', strtotime($row->tanggal)); ?></td>
-                        <td class="py-4 px-3 font-semibold text-gray-900"><?= htmlspecialchars($row->nama_supplier); ?></td>
+                        <td class="py-4 px-3 font-semibold text-gray-900"><?= htmlspecialchars($row->nama_supplier ?? '-'); ?></td>
                         <td class="py-4 px-3 text-gray-600"><?= htmlspecialchars($row->nama_barang); ?> <span class="text-xs font-bold text-gray-400">(x<?= $row->jumlah; ?>)</span></td>
                         <td class="py-4 px-3 font-bold text-gray-900">IDR <?= number_format($total_harga, 0, ',', '.'); ?></td>
                         <td class="py-4 px-3 text-center">
                             <?php if ($row->status === 'lunas'): ?>
-                                <span class="bg-green-600 text-white px-3 py-1 rounded-md text-[11px] font-bold block text-center max-w-[90px] mx-auto">Lunas</span>
+                                <span class="bg-green-600 text-white px-3 py-1.5 rounded-md text-[11px] font-bold block text-center max-w-[100px] mx-auto flex items-center justify-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg> Lunas
+                                </span>
                             <?php elseif ($row->status === 'belum_lunas'): ?>
-                                <span class="bg-red-600 text-white px-3 py-1 rounded-md text-[11px] font-bold block text-center max-w-[90px] mx-auto">Belum Lunas</span>
+                                <span class="bg-red-600 text-white px-3 py-1.5 rounded-md text-[11px] font-bold block text-center max-w-[110px] mx-auto flex items-center justify-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg> Belum Lunas
+                                </span>
                             <?php else: ?>
-                                <span class="bg-orange-500 text-white px-2 py-1 rounded-md text-[11px] font-bold block text-center max-w-[100px] mx-auto">Cicilan</span>
+                                <span class="bg-orange-500 text-white px-3 py-1.5 rounded-md text-[11px] font-bold block text-center max-w-[100px] mx-auto flex items-center justify-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Cicilan
+                                </span>
                             <?php endif; ?>
                         </td>
+                        <td class="py-4 px-3 text-gray-500 text-xs italic max-w-[180px] truncate"><?= htmlspecialchars($row->keterangan ?? '') ?></td>
                         <td class="py-4 px-3 text-right">
+                            <a href="index.php?page=transaksi_masuk&cetak_pdf=<?= $row->id_masuk ?>" target="_blank" class="inline-flex items-center gap-1 text-emerald-600 font-bold hover:underline text-xs uppercase tracking-wider mr-3">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                PDF
+                            </a>
                             <button onclick="openEdit('<?= $row->id_masuk ?>', '<?= $row->tanggal ?>', '<?= $row->id_barang ?>', '<?= $row->id_supplier ?>', '<?= $row->jumlah ?>', '<?= $row->harga_beli ?? 0 ?>', '<?= $row->status ?>', '<?= htmlspecialchars($row->keterangan ?? '') ?>')" class="text-blue-600 font-bold hover:underline text-xs uppercase tracking-wider">Edit</button>
                         </td>
                     </tr>
                 <?php endforeach; else: ?>
-                    <tr><td colspan="8" class="py-12 text-center text-gray-400 font-medium">Belum ada riwayat transaksi faktur masuk.</td></tr>
+                    <tr><td colspan="9" class="py-12 text-center text-gray-400 font-medium">Belum ada riwayat transaksi faktur masuk.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
     </div>
 </main>
 
-<div id="modalM" class="modal fixed inset-0 flex items-center justify-center z-[100]">
-    <div class="modal-overlay absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
-    <div class="modal-container bg-white w-full max-w-xl mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden border border-gray-100 transform transition-all scale-95 duration-200 relative p-6">
+<div id="modalM" class="modal fixed inset-0 flex items-start justify-center overflow-y-auto z-[120]">
+    <div class="modal-overlay fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+    <div class="modal-container bg-white w-full max-w-xl mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden border border-gray-100 transform transition-all scale-95 duration-200 relative p-6 my-8">
         <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
@@ -93,7 +123,7 @@
             <h3 id="mTitle" class="text-xl font-bold text-gray-900 tracking-tight">Buat Faktur Pembelian Baru</h3>
             <p class="text-xs text-gray-500 mt-1">Catat barang yang masuk ke gudang dari pemasok</p>
         </div>
-        <form action="index.php?page=transaksi_masuk" method="POST" class="space-y-4">
+        <form action="index.php?page=transaksi_masuk" method="POST" class="space-y-4" onsubmit="return disableSubmit(this)">
             <input type="hidden" name="id_masuk" id="mIdMasuk">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>

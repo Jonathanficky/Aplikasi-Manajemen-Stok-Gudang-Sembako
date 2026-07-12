@@ -9,6 +9,22 @@
     <style>
         .login-card { border: 1px solid #e5e7eb; border-radius: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
         .feature-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
+        .toast-popup-error {
+            position: fixed; top: 30px; right: 20px; z-index: 9999;
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 18px; border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            font-size: 13px; font-weight: 600; max-width: 360px;
+            background: #fef2f2; border: 1px solid #fecaca; color: #991b1b;
+            animation: toastIn 0.35s ease-out forwards;
+        }
+        .toast-popup-error .toast-close {
+            margin-left: auto; cursor: pointer; opacity: 0.4;
+            background: none; border: none; font-size: 18px; line-height: 1;
+            padding: 0 2px; color: inherit;
+        }
+        .toast-popup-error .toast-close:hover { opacity: 1; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
@@ -71,7 +87,15 @@
                 <div class="login-card bg-white p-8 w-full max-w-[380px]">
                     <h3 class="text-xl font-bold text-gray-900 mb-1">Login ke Sistem</h3>
                     <p class="text-gray-400 text-xs mb-8">Masukkan kredensial Anda untuk masuk.</p>
-                    <form action="index.php?page=proses_login" method="POST" class="space-y-5">
+                    <?php if (Session::hasFlash()): $f = Session::getFlash(); ?>
+                    <div class="toast-popup-error" id="loginToast">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <span><?= htmlspecialchars($f['message'], ENT_QUOTES, 'UTF-8') ?></span>
+                        <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+                    </div>
+                    <script>setTimeout(function(){var t=document.getElementById('loginToast');if(t){t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(function(){t.remove()},300)}},4000);</script>
+                    <?php endif; ?>
+                    <form action="index.php?page=proses_login" method="POST" class="space-y-5" onsubmit="return disableSubmit(this)">
                         <div>
                             <label class="block text-gray-700 font-semibold mb-1.5 text-xs">Username</label>
                             <input type="text" name="username" required autocomplete="off" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:border-black outline-none transition-all text-sm">

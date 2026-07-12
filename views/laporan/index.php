@@ -9,6 +9,59 @@
 
     <div class="border border-gray-900 rounded-2xl p-6 bg-white shadow-sm flex justify-between items-center">
         <div>
+            <h3 class="font-bold text-gray-900 text-sm">Laporan Laba / Rugi</h3>
+            <p class="text-xs text-gray-500 mt-1">Ringkasan laba rugi berdasarkan periode bulanan</p>
+        </div>
+        <form method="GET" class="flex items-center gap-2">
+            <input type="hidden" name="page" value="laporan">
+            <label class="text-xs text-gray-500 font-medium" for="tahun">Tahun</label>
+            <select name="tahun" id="tahun" class="border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium">
+                <?php foreach ([2026, 2025] as $t): ?>
+                <option value="<?= $t ?>" <?= $t == $tahunTerpilih ? 'selected' : '' ?>><?= $t ?></option>
+                <?php endforeach; ?>
+            </select>
+            <button type="submit" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-800 transition-all">Tampilkan</button>
+        </form>
+    </div>
+
+    <div class="border border-gray-900 rounded-2xl p-6 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left whitespace-nowrap">
+                <thead>
+                    <tr class="text-gray-900 font-bold text-sm border-b-2 border-gray-900 pb-2">
+                        <th class="pb-3 px-2 text-left">Bulan</th>
+                        <th class="pb-3 px-2 text-right">Penjualan</th>
+                        <th class="pb-3 px-2 text-right">Pembelian</th>
+                        <th class="pb-3 px-2 text-right">Laba / Rugi</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm">
+                    <?php $jualTotal = 0; $beliTotal = 0; $lrTotal = 0; ?>
+                    <?php foreach ($labaRugiBulan as $lr):
+                        $jualTotal += $lr['penjualan'];
+                        $beliTotal += $lr['pembelian'];
+                        $lrTotal += $lr['laba_rugi'];
+                    ?>
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                        <td class="py-3 px-2 font-bold text-gray-900"><?= $lr['bulan'] ?></td>
+                        <td class="py-3 px-2 text-right text-emerald-600 font-semibold">IDR <?= number_format($lr['penjualan'], 0, ',', '.') ?></td>
+                        <td class="py-3 px-2 text-right text-blue-600 font-semibold">IDR <?= number_format($lr['pembelian'], 0, ',', '.') ?></td>
+                        <td class="py-3 px-2 text-right font-bold <?= $lr['laba_rugi'] >= 0 ? 'text-emerald-700' : 'text-red-600' ?>">IDR <?= number_format(abs($lr['laba_rugi']), 0, ',', '.') ?> <span class="text-xs font-normal"><?= $lr['laba_rugi'] >= 0 ? '💰' : '🔴' ?></span></td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <tr class="font-bold text-gray-900 bg-gray-100/70">
+                        <td class="py-3 px-2">TOTAL</td>
+                        <td class="py-3 px-2 text-right text-emerald-700">IDR <?= number_format($jualTotal, 0, ',', '.') ?></td>
+                        <td class="py-3 px-2 text-right text-blue-700">IDR <?= number_format($beliTotal, 0, ',', '.') ?></td>
+                        <td class="py-3 px-2 text-right <?= $lrTotal >= 0 ? 'text-emerald-800' : 'text-red-700' ?>">IDR <?= number_format(abs($lrTotal), 0, ',', '.') ?> <span class="text-xs font-normal"><?= $lrTotal >= 0 ? 'Laba' : 'Rugi' ?></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="border border-gray-900 rounded-2xl p-6 bg-white shadow-sm flex justify-between items-center">
+        <div>
             <h3 class="font-bold text-gray-900 text-sm">Unduh Laporan Stok Saat Ini</h3>
             <p class="text-xs text-gray-500 mt-1">Ekspor data ke dalam format Excel atau PDF untuk dianalisis lebih lanjut.</p>
         </div>

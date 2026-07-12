@@ -30,7 +30,7 @@ class TransaksiMasuk
         $q = mysqli_query($koneksi, "SELECT tm.*, b.nama_barang, s.nama_supplier
             FROM transaksi_masuk tm
             JOIN barang b ON tm.id_barang = b.id_barang
-            JOIN supplier s ON tm.id_supplier = s.id_supplier
+            LEFT JOIN supplier s ON tm.id_supplier = s.id_supplier
             ORDER BY tm.id_masuk DESC");
         if ($q) {
             while ($r = mysqli_fetch_assoc($q)) {
@@ -43,7 +43,11 @@ class TransaksiMasuk
     public static function find(int $id): ?self
     {
         $koneksi = Database::getInstance()->getConnection();
-        $stmt = mysqli_prepare($koneksi, "SELECT * FROM transaksi_masuk WHERE id_masuk = ?");
+        $stmt = mysqli_prepare($koneksi, "SELECT tm.*, b.nama_barang, s.nama_supplier
+            FROM transaksi_masuk tm
+            JOIN barang b ON tm.id_barang = b.id_barang
+            LEFT JOIN supplier s ON tm.id_supplier = s.id_supplier
+            WHERE tm.id_masuk = ?");
         if ($stmt) {
             mysqli_stmt_bind_param($stmt, 'i', $id);
             mysqli_stmt_execute($stmt);
@@ -56,25 +60,57 @@ class TransaksiMasuk
         return null;
     }
 
-    public static function monthlySummary(): array
-    {
-        $koneksi = Database::getInstance()->getConnection();
-        $result = [];
-        $q = mysqli_query($koneksi, "SELECT DATE_FORMAT(tanggal, '%Y-%m') as bulan, SUM(jumlah * harga_beli) as total_nilai FROM transaksi_masuk GROUP BY bulan ORDER BY bulan ASC");
-        if ($q) {
-            while ($r = mysqli_fetch_assoc($q)) {
-                $result[] = $r;
-            }
-        }
-        return $result;
-    }
-
     public static function total(): int
     {
         $koneksi = Database::getInstance()->getConnection();
         $q = mysqli_query($koneksi, "SELECT COUNT(*) as jml FROM transaksi_masuk");
         $r = mysqli_fetch_assoc($q);
         return (int) ($r['jml'] ?? 0);
+    }
+
+    public static function totalNilai(): int
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $q = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah * harga_beli), 0) as jml FROM transaksi_masuk");
+        $r = mysqli_fetch_assoc($q);
+        return (int) ($r['jml'] ?? 0);
+    }
+
+    public static function allByDateRange(string $dari, string $sampai): array
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $result = [];
+        $stmt = mysqli_prepare($koneksi, "SELECT tm.*, b.nama_barang, s.nama_supplier
+            FROM transaksi_masuk tm
+            JOIN barang b ON tm.id_barang = b.id_barang
+            LEFT JOIN supplier s ON tm.id_supplier = s.id_supplier
+            WHERE tm.tanggal BETWEEN ? AND ?
+            ORDER BY tm.id_masuk DESC");
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, 'ss', $dari, $sampai);
+            mysqli_stmt_execute($stmt);
+            $q = mysqli_stmt_get_result($stmt);
+            while ($r = mysqli_fetch_assoc($q)) {
+                $result[] = new self($r);
+            }
+            mysqli_stmt_close($stmt);
+        }
+        return $result;
+    }
+
+    public static function monthlySummary(): array
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $result = [];
+        $q = mysqli_query($koneksi, "SELECT DATE_FORMAT(tanggal, '%Y-%m') as bulan, COUNT(*) as total_transaksi, COALESCE(SUM(jumlah * harga_beli), 0) as total_nilai
+            FROM transaksi_masuk
+            GROUP BY bulan ORDER BY bulan DESC");
+        if ($q) {
+            while ($r = mysqli_fetch_assoc($q)) {
+                $result[] = $r;
+            }
+        }
+        return $result;
     }
 
     public function save(): bool
@@ -105,29 +141,45 @@ class TransaksiMasuk
             $jumlah_lama = (int) ($lama['jumlah'] ?? 0);
 
             $stmt1 = mysqli_prepare($koneksi, "UPDATE transaksi_masuk SET id_barang=?, id_supplier=?, tanggal=?, jumlah=?, harga_beli=?, status=?, keterangan=?, id_user=?, pencatat=? WHERE id_masuk=?");
-            mysqli_stmt_bind_param($stmt1, 'iisiississ', $id_barang, $id_supplier, $tanggal, $jumlah, $harga_beli, $status, $keterangan, $id_user, $pencatat, $id_masuk);
+            mysqli_stmt_bind_param($stmt1, 'iisiissisi', $id_barang, $id_supplier, $tanggal, $jumlah, $harga_beli, $status, $keterangan, $id_user, $pencatat, $id_masuk);
             $q1 = mysqli_stmt_execute($stmt1);
             mysqli_stmt_close($stmt1);
 
             if ($id_barang_lama == $id_barang) {
                 $selisih = $jumlah - $jumlah_lama;
-                $stmt2 = mysqli_prepare($koneksi, "UPDATE barang SET stok = stok + ? WHERE id_barang = ?");
-                mysqli_stmt_bind_param($stmt2, 'ii', $selisih, $id_barang);
-                $q2 = mysqli_stmt_execute($stmt2);
-                mysqli_stmt_close($stmt2);
+                if ($selisih > 0) {
+                    $stmt2 = mysqli_prepare($koneksi, "UPDATE barang SET stok = stok + ? WHERE id_barang = ?");
+                    mysqli_stmt_bind_param($stmt2, 'ii', $selisih, $id_barang);
+                    $q2 = mysqli_stmt_execute($stmt2);
+                    $affected2 = mysqli_affected_rows($koneksi);
+                    mysqli_stmt_close($stmt2);
+                } elseif ($selisih < 0) {
+                    $abs = abs($selisih);
+                    $stmt2 = mysqli_prepare($koneksi, "UPDATE barang SET stok = stok + ? WHERE id_barang = ? AND stok >= ?");
+                    mysqli_stmt_bind_param($stmt2, 'iii', $selisih, $id_barang, $abs);
+                    $q2 = mysqli_stmt_execute($stmt2);
+                    $affected2 = mysqli_affected_rows($koneksi);
+                    mysqli_stmt_close($stmt2);
+                } else {
+                    $q2 = true;
+                    $affected2 = 1;
+                }
                 $q3 = true;
+                $affected3 = 1;
             } else {
-                $stmt2 = mysqli_prepare($koneksi, "UPDATE barang SET stok = stok - ? WHERE id_barang = ?");
-                mysqli_stmt_bind_param($stmt2, 'ii', $jumlah_lama, $id_barang_lama);
+                $stmt2 = mysqli_prepare($koneksi, "UPDATE barang SET stok = stok - ? WHERE id_barang = ? AND stok >= ?");
+                mysqli_stmt_bind_param($stmt2, 'iii', $jumlah_lama, $id_barang_lama, $jumlah_lama);
                 $q2 = mysqli_stmt_execute($stmt2);
+                $affected2 = mysqli_affected_rows($koneksi);
                 mysqli_stmt_close($stmt2);
                 $stmt3 = mysqli_prepare($koneksi, "UPDATE barang SET stok = stok + ? WHERE id_barang = ?");
                 mysqli_stmt_bind_param($stmt3, 'ii', $jumlah, $id_barang);
                 $q3 = mysqli_stmt_execute($stmt3);
+                $affected3 = mysqli_affected_rows($koneksi);
                 mysqli_stmt_close($stmt3);
             }
 
-            if ($q1 && $q2 && $q3) {
+            if ($q1 && $q2 && $affected2 > 0 && $q3 && $affected3 > 0) {
                 mysqli_commit($koneksi);
                 return true;
             }
@@ -135,7 +187,7 @@ class TransaksiMasuk
             return false;
         } else {
             $stmt1 = mysqli_prepare($koneksi, "INSERT INTO transaksi_masuk (id_barang, id_supplier, tanggal, jumlah, harga_beli, status, keterangan, id_user, pencatat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            mysqli_stmt_bind_param($stmt1, 'iississis', $id_barang, $id_supplier, $tanggal, $jumlah, $harga_beli, $status, $keterangan, $id_user, $pencatat);
+            mysqli_stmt_bind_param($stmt1, 'iisiissis', $id_barang, $id_supplier, $tanggal, $jumlah, $harga_beli, $status, $keterangan, $id_user, $pencatat);
             $q1 = mysqli_stmt_execute($stmt1);
             mysqli_stmt_close($stmt1);
 

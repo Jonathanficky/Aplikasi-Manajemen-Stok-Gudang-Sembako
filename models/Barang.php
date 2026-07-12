@@ -1,10 +1,4 @@
 <?php
-/**
- * ==============================================
- * Nama Anggota  : Ariyan
- * Nama File     : models/Barang.php
- * ==============================================
- */
 class Barang
 {
     public $id_barang;
@@ -87,6 +81,14 @@ class Barang
     {
         $koneksi = Database::getInstance()->getConnection();
         $q = mysqli_query($koneksi, "SELECT COUNT(*) as jml FROM barang");
+        $r = mysqli_fetch_assoc($q);
+        return (int) ($r['jml'] ?? 0);
+    }
+
+    public static function totalNilaiAsetAll(): int
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $q = mysqli_query($koneksi, "SELECT COALESCE(SUM(stok * harga_beli), 0) as jml FROM barang");
         $r = mysqli_fetch_assoc($q);
         return (int) ($r['jml'] ?? 0);
     }
@@ -190,6 +192,26 @@ class Barang
     public function totalNilaiAset(): float
     {
         return $this->stok * $this->harga_beli;
+    }
+
+    public static function generateKodeBaru(): string
+    {
+        $koneksi = Database::getInstance()->getConnection();
+        $q = mysqli_query($koneksi, "SELECT kode_barang FROM barang ORDER BY id_barang DESC LIMIT 1");
+        $r = mysqli_fetch_assoc($q);
+
+        if ($r) {
+            $kode = $r['kode_barang'];
+            preg_match('/(\d+)$/', $kode, $matches);
+            if ($matches) {
+                $angka = (int) $matches[1] + 1;
+                $prefix = substr($kode, 0, -strlen($matches[1]));
+                $panjang = strlen($matches[1]);
+                return $prefix . str_pad($angka, $panjang, '0', STR_PAD_LEFT);
+            }
+        }
+
+        return 'BRG001';
     }
 
     public static function byKategori(int $id_kategori): array

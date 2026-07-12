@@ -1,11 +1,4 @@
-<?php
-/**
- * ==============================================
- * Nama Anggota  : Ariyan
- * Nama File     : views/barang/index.php
- * ==============================================
- */
-$title = 'Barang - Toko Sembako'; $activeMenu = 'barang'; ?>
+<?php $title = 'Barang - Toko Sembako'; $activeMenu = 'barang'; ?>
 <?php include __DIR__ . '/../layouts/header.php'; ?>
 
 <main class="p-8 space-y-6">
@@ -43,10 +36,7 @@ $title = 'Barang - Toko Sembako'; $activeMenu = 'barang'; ?>
                     <option value="<?= $k->id_kategori ?>" <?= $selectedKategori == $k->id_kategori ? 'selected' : '' ?>><?= $k->nama_kategori ?></option>
                 <?php endforeach; ?>
             </select>
-            <a href="index.php?page=barang_export_kategori&kategori=<?= $selectedKategori > 0 ? $selectedKategori : 1 ?>" class="bg-green-600 text-white px-4 py-3 rounded-xl text-sm font-bold hover:bg-green-700 transition-all flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                Export Excel
-            </a>
+
         </div>
     </div>
 
@@ -112,12 +102,13 @@ $title = 'Barang - Toko Sembako'; $activeMenu = 'barang'; ?>
                     </div>
                     <div>
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kategori</label>
-                        <select name="id_kategori" id="form_kategori" required class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-black bg-gray-50 text-sm">
+                        <select name="id_kategori" id="form_kategori" required class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-black bg-gray-50 text-sm" onchange="tampilkanDeskripsi(this)">
                             <option value="">-- Pilih --</option>
                             <?php foreach ($kategoriList as $k): ?>
                                 <option value="<?= $k->id_kategori ?>"><?= $k->nama_kategori ?></option>
                             <?php endforeach; ?>
                         </select>
+                        <p id="deskripsiKategori" class="text-[11px] text-gray-400 mt-1.5 italic"></p>
                     </div>
                 </div>
                 <div>
@@ -148,17 +139,31 @@ $title = 'Barang - Toko Sembako'; $activeMenu = 'barang'; ?>
 </div>
 
 <script>
+    var kodeBaru = '<?= $kodeBaru ?>';
+    var deskripsiKategori = {
+        <?php foreach ($kategoriList as $k): ?>
+        "<?= $k->id_kategori ?>": "<?= htmlspecialchars($k->deskripsi) ?>",
+        <?php endforeach; ?>
+    };
+
+    function tampilkanDeskripsi(sel) {
+        var el = document.getElementById('deskripsiKategori');
+        var desk = deskripsiKategori[sel.value] || '';
+        el.textContent = desk ? '📋 ' + desk : '';
+    }
+
     const modal = document.getElementById('modalBarang');
     function openTambahModal() {
         document.getElementById('modalTitle').innerText = "Tambah Barang Baru";
         document.getElementById('btnSubmit').name = "simpan_barang";
         document.getElementById('form_id').value = "";
-        document.getElementById('form_kode').value = "";
+        document.getElementById('form_kode').value = kodeBaru;
         document.getElementById('form_nama').value = "";
         document.getElementById('form_kategori').value = "";
         document.getElementById('form_stok').value = "0";
         document.getElementById('form_stok_min').value = "5";
         document.getElementById('form_harga').value = "";
+        document.getElementById('deskripsiKategori').textContent = '';
         modal.classList.add('active');
         document.body.classList.add('modal-active');
     }

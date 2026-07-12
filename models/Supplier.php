@@ -1,9 +1,4 @@
 <?php
-// Model untuk pengelolaan data supplier
-// Mengambil seluruh data supplier
-// Menambahkan supplier baru ke database
-// Memperbarui informasi supplier
-// Menghapus data supplier dari database
 class Supplier
 {
     public $id_supplier;

@@ -1,9 +1,3 @@
-<!--
-==============================================
-Nama Anggota  : Ariyan
-Nama File     : views/layouts/header.php
-==============================================
--->
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -11,8 +5,8 @@ Nama File     : views/layouts/header.php
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Toko Sembako' ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
     <link rel="stylesheet" href="assets/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
     <style>
         .modal { transition: opacity 0.2s ease; opacity: 0; pointer-events: none; }
         .modal.active { opacity: 1; pointer-events: auto; }

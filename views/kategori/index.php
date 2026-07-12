@@ -60,7 +60,7 @@
                 <input type="hidden" name="id_kategori" id="form_id">
                 <div>
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Nama Kategori</label>
-                    <input type="text" name="nama_kategori" id="form_nama" required oninput="autoDeskripsi(this)" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-black bg-gray-50 transition-all">
+                    <input type="text" name="nama_kategori" id="form_nama" required class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-black bg-gray-50 transition-all">
                 </div>
                 <div>
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Deskripsi</label>
@@ -76,10 +76,6 @@
 </div>
 
 <script>
-    function autoDeskripsi(el) {
-        document.getElementById('form_deskripsi').value = el.value ? 'Kategori ' + el.value : '';
-    }
-
     const modal = document.getElementById('modalKategori');
     function openTambahModal() {
         document.getElementById('modalTitle').innerText = "Tambah Kategori Baru";
